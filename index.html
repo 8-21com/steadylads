@@ -7,9 +7,11 @@
     <style>
         body {
             background-color: black;
-            color: white;
-            text-align: center;
+            color: #ff4500;
             font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 0;
             overflow: hidden;
         }
         .container {
@@ -21,73 +23,93 @@
             justify-content: center;
             align-items: center;
         }
+        .countdown {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+        }
         .rune-container {
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
         }
         .rune-ring {
             position: absolute;
-            width: 100px;
-            height: 100px;
+            top: 50%;
+            left: 50%;
+            transform-origin: center;
             animation: rotate 10s linear infinite;
-        }
-        .rune-ring:nth-child(2) {
-            width: 150px;
-            height: 150px;
-            animation-duration: 15s;
-        }
-        .rune-ring:nth-child(3) {
-            width: 200px;
-            height: 200px;
-            animation-duration: 20s;
         }
         .rune {
             position: absolute;
-            font-size: 20px;
+            font-size: 1.5rem;
             color: #ff4500;
-            transform-origin: center;
         }
         @keyframes rotate {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="rune-container" id="runeContainer"></div>
+        <div class="countdown">Current Block Countdown: <span id="countdown"></span></div>
+        <div class="rune-container" id="rune-animation"></div>
+        <div class="footer">Unofficial Countdown</div>
     </div>
     <script>
-        const runes = ["ᚠ", "ᚢ", "ᚦ", "ᚨ", "ᚱ", "ᚲ", "ᚷ", "ᚹ", "ᚺ", "ᚾ", "ᛁ", "ᛃ", "ᛇ", "ᛈ", "ᛉ", "ᛋ", "ᛏ", "ᛒ", "ᛖ", "ᛗ", "ᛚ", "ᛜ", "ᛟ", "ᛞ"];
-        const runeContainer = document.getElementById("runeContainer");
-
-        function createRuneRing(radius, speed) {
-            let ring = document.createElement("div");
-            ring.className = "rune-ring";
-            ring.style.width = `${radius * 2}px`;
-            ring.style.height = `${radius * 2}px`;
-            ring.style.animationDuration = `${speed}s`;
-            runeContainer.appendChild(ring);
-
-            for (let i = 0; i < 12; i++) {
-                let rune = document.createElement("div");
-                rune.className = "rune";
-                rune.innerText = runes[Math.floor(Math.random() * runes.length)];
-                let angle = (i / 12) * 360;
-                rune.style.transform = `rotate(${angle}deg) translate(${radius}px) rotate(-${angle}deg)`;
-                ring.appendChild(rune);
+        function updateCountdown() {
+            let targetTime = new Date();
+            targetTime.setMinutes(targetTime.getMinutes() + 10);
+            function tick() {
+                let now = new Date();
+                let diff = targetTime - now;
+                let minutes = Math.floor(diff / 60000);
+                let seconds = Math.floor((diff % 60000) / 1000);
+                document.getElementById('countdown').textContent = `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+                if (diff > 0) {
+                    requestAnimationFrame(tick);
+                }
+            }
+            tick();
+        }
+        updateCountdown();
+        
+        function createRunes() {
+            const runes = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛋᛏᛒᛖᛗᛚᛜᛟ".split('');
+            const container = document.getElementById("rune-animation");
+            const layers = 3;
+            const radiusStep = 30;
+            for (let layer = 0; layer < layers; layer++) {
+                const ring = document.createElement("div");
+                ring.className = "rune-ring";
+                ring.style.width = `${(layer + 1) * radiusStep * 2}px`;
+                ring.style.height = `${(layer + 1) * radiusStep * 2}px`;
+                ring.style.animationDuration = `${10 - layer * 2}s`;
+                const count = 10 + layer * 5;
+                for (let i = 0; i < count; i++) {
+                    const rune = document.createElement("div");
+                    rune.className = "rune";
+                    rune.textContent = runes[Math.floor(Math.random() * runes.length)];
+                    const angle = (i / count) * Math.PI * 2;
+                    const x = Math.cos(angle) * (layer + 1) * radiusStep;
+                    const y = Math.sin(angle) * (layer + 1) * radiusStep;
+                    rune.style.transform = `translate(${x}px, ${y}px)`;
+                    ring.appendChild(rune);
+                }
+                container.appendChild(ring);
             }
         }
-
-        createRuneRing(50, 10);
-        createRuneRing(75, 15);
-        createRuneRing(100, 20);
+        createRunes();
     </script>
 </body>
 </html>
