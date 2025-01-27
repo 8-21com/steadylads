@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Countdown</title>
+    <title>Countdown with Spinning Runes</title>
     <style>
         body {
             background-color: black;
@@ -11,62 +11,73 @@
             text-align: center;
             font-family: Arial, sans-serif;
         }
-        #countdown-container {
-            position: absolute;
-            top: 40%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 24px;
+        .countdown {
+            font-size: 2em;
+            margin-top: 20px;
         }
-        #footer {
+        .footer {
             position: absolute;
             bottom: 10px;
             width: 100%;
             text-align: center;
-            font-size: 14px;
-            color: grey;
+            color: white;
         }
         .rune-container {
             position: absolute;
-            top: 50%;
             left: 50%;
+            top: 50%;
             transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+        }
+        .ring {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: spin 10s linear infinite;
+        }
+        .ring:nth-child(even) {
+            animation-direction: reverse;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
         }
         .rune {
             position: absolute;
-            font-size: 18px;
-            color: white;
+            font-size: 24px;
+            color: #ffffff;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
         }
     </style>
 </head>
 <body>
-    <div id="countdown-container">
-        <p id="countdown">Current Block Countdown: 10:00</p>
+    <div class="countdown">Current Block Countdown: <span id="timer">10:00</span></div>
+    
+    <div class="rune-container">
+        <div class="ring" style="width: 50px; height: 50px;">
+            <span class="rune" style="top: 5px; left: 25px;">ᛗ</span>
+            <span class="rune" style="top: 25px; left: 5px;">ᚨ</span>
+            <span class="rune" style="top: 25px; right: 5px;">ᚱ</span>
+            <span class="rune" style="bottom: 5px; left: 25px;">ᛏ</span>
+        </div>
+        <div class="ring" style="width: 100px; height: 100px;">
+            <span class="rune" style="top: 10px; left: 50px;">ᛟ</span>
+            <span class="rune" style="top: 50px; left: 10px;">ᛉ</span>
+            <span class="rune" style="top: 50px; right: 10px;">ᛒ</span>
+            <span class="rune" style="bottom: 10px; left: 50px;">ᚦ</span>
+        </div>
+        <div class="ring" style="width: 150px; height: 150px;">
+            <span class="rune" style="top: 15px; left: 75px;">ᚾ</span>
+            <span class="rune" style="top: 75px; left: 15px;">ᛖ</span>
+            <span class="rune" style="top: 75px; right: 15px;">ᛃ</span>
+            <span class="rune" style="bottom: 15px; left: 75px;">ᛋ</span>
+        </div>
     </div>
-    <div id="rune-animation" class="rune-container"></div>
-    <div id="footer">Unofficial Countdown</div>
-    <script>
-        function generateRunes() {
-            const runeSet = ['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ', 'ᚷ', 'ᚹ', 'ᚺ', 'ᚾ', 'ᛁ', 'ᛃ', 'ᛇ', 'ᛈ', 'ᛉ', 'ᛋ', 'ᛏ', 'ᛒ', 'ᛖ', 'ᛗ', 'ᛚ', 'ᛜ', 'ᛞ', 'ᛟ'];
-            const container = document.getElementById('rune-animation');
-            container.innerHTML = '';
-            const layers = 3;
-            const baseRadius = 30;
-            for (let layer = 0; layer < layers; layer++) {
-                let numRunes = 8 + layer * 6;
-                let radius = baseRadius + layer * 20;
-                for (let i = 0; i < numRunes; i++) {
-                    let angle = (i / numRunes) * 2 * Math.PI;
-                    let rune = document.createElement('span');
-                    rune.className = 'rune';
-                    rune.textContent = runeSet[Math.floor(Math.random() * runeSet.length)];
-                    rune.style.left = `${50 + Math.cos(angle) * radius}px`;
-                    rune.style.top = `${50 + Math.sin(angle) * radius}px`;
-                    container.appendChild(rune);
-                }
-            }
-        }
-        generateRunes();
-    </script>
+    
+    <div class="footer">Unofficial Countdown</div>
 </body>
 </html>
