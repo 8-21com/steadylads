@@ -24,13 +24,15 @@
             font-weight: 900;
         }
 
+        /* Countdown Box: Wider and Consistently Sized */
         #countdown-container {
             display: inline-block;
             padding: 20px;
             border: 2px solid #4D4C4C;
             background-color: #000000;
             margin-top: 20px;
-            width: fit-content;
+            width: 300px; /* Fixed width to prevent resizing */
+            text-align: center;
         }
 
         #countdown {
@@ -38,8 +40,9 @@
             font-weight: 900;
             color: #FF9900;
             padding: 10px;
-            display: inline-block;
+            display: block;
             text-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
+            min-width: 250px; /* Prevents width fluctuation */
         }
 
         .info-text {
