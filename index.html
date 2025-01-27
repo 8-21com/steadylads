@@ -67,11 +67,11 @@
             text-transform: uppercase;
         }
 
-        /* Current Block (Subtle Slow Pulsating) */
+        /* Current Block (Subtle Slow Pulsating, slightly brighter) */
         #current-block {
             font-size: 16px;
             font-weight: 900;
-            color: #AAAAAA;
+            color: #BBBBBB;
             margin-top: 10px;
             text-align: center;
             font-family: 'Courier New', Courier, monospace;
@@ -81,27 +81,44 @@
 
         /* Slow Subtle Glowing Effect */
         @keyframes subtleGlow {
-            0% { opacity: 1; text-shadow: 0 0 5px rgba(170, 170, 170, 0.6); color: #AAAAAA; }
-            50% { opacity: 0.5; text-shadow: 0 0 5px rgba(77, 76, 76, 0.3); color: #4D4C4C; }
-            100% { opacity: 1; text-shadow: 0 0 5px rgba(170, 170, 170, 0.6); color: #AAAAAA; }
+            0% { opacity: 1; text-shadow: 0 0 5px rgba(187, 187, 187, 0.6); color: #BBBBBB; }
+            50% { opacity: 0.6; text-shadow: 0 0 5px rgba(100, 100, 100, 0.3); color: #666666; }
+            100% { opacity: 1; text-shadow: 0 0 5px rgba(187, 187, 187, 0.6); color: #BBBBBB; }
         }
 
-        /* Background Runes Effect */
-        #runeCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            opacity: 0.28; /* Subtle visibility */
-            z-index: -1;
+        /* Progress Bar Styling */
+        #progress-container {
+            width: 50%;
+            max-width: 400px;
+            height: 8px;
+            background-color: #333;
+            margin: 10px auto;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        #progress-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #666;
+            transition: width 0.5s ease-in-out;
+        }
+
+        /* Footer Styling */
+        #footer {
+            font-size: 18px;
+            font-weight: 900;
+            color: #AAAAAA;
+            margin-top: 50px;
+            text-align: center;
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
         }
     </style>
 </head>
 <body>
-    <canvas id="runeCanvas"></canvas>
-
     <h2>Block 888,888</h2>
     <div id="countdown-container">
         <div id="countdown">Loading...</div>
@@ -109,46 +126,40 @@
 
     <div id="estimated-arrival">ESTIMATED ARRIVAL: Calculating...</div>
     <div id="current-block">CURRENT BLOCK: Fetching...</div>
+    <div id="progress-container">
+        <div id="progress-bar"></div>
+    </div>
+
+    <div id="footer">
+        <div>UNOFFICIAL COUNTDOWN</div>
+        <a href="https://docs.8-21.com/the-history-of-rsic/project-updates#block-888-888" target="_self">8-21.com</a>
+    </div>
 
     <script>
-        /* Background Runes Effect */
-        const runes = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ".split("");
-        const canvas = document.getElementById("runeCanvas");
-        const ctx = canvas.getContext("2d");
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
+        async function fetchBlockData() {
+            try {
+                let response = await fetch('https://mempool.space/api/blocks/tip/height');
+                let currentHeight = await response.json();
+                if (!currentHeight) return;
+                document.getElementById("current-block").innerText = `CURRENT BLOCK: ${currentHeight}`;
+                updateProgressBar(currentHeight);
+            } catch (error) {
+                console.error("Error fetching block data:", error);
+            }
         }
 
-        window.addEventListener("resize", resizeCanvas);
-        resizeCanvas();
-
-        let runeSymbols = [];
-        for (let i = 0; i < 50; i++) {
-            runeSymbols.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                rune: runes[Math.floor(Math.random() * runes.length)],
-                speed: Math.random() * 1.5 + 0.5,
-            });
+        function updateProgressBar(currentHeight) {
+            const targetBlock = 888888;
+            let progress = ((currentHeight / targetBlock) * 100).toFixed(2);
+            document.getElementById("progress-bar").style.width = progress + "%";
         }
 
-        function drawRunes() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
-            ctx.font = "30px Courier New";
-
-            runeSymbols.forEach((runeObj) => {
-                ctx.fillText(runeObj.rune, runeObj.x, runeObj.y);
-                runeObj.y += runeObj.speed;
-                if (runeObj.y > canvas.height) runeObj.y = 0;
-            });
-
-            requestAnimationFrame(drawRunes);
+        async function updateCountdown() {
+            await fetchBlockData();
+            setInterval(fetchBlockData, 30000);
         }
 
-        drawRunes();
+        document.addEventListener("DOMContentLoaded", updateCountdown);
     </script>
 </body>
 </html>
