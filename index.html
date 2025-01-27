@@ -79,23 +79,6 @@
             text-transform: uppercase;
         }
 
-        /* Progress Bar Styling */
-        #progress-container {
-            width: fit-content;
-            margin: 10px auto;
-            background-color: #333;
-            border-radius: 3px;
-            padding: 3px;
-        }
-
-        #progress-bar {
-            height: 8px;
-            background-color: #666;
-            width: 0%; /* Dynamically updated */
-            transition: width 0.5s ease-in-out;
-            border-radius: 3px;
-        }
-
         /* Footer Styling */
         #footer {
             font-size: 18px;
@@ -104,37 +87,19 @@
             margin-top: 50px;
             text-align: center;
             position: absolute;
-            bottom: 20px;
+            bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-        }
-
-        /* Background Canvas for Effects */
-        #runeCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            opacity: 0.25;
-            z-index: -1;
         }
     </style>
 </head>
 <body>
-    <canvas id="runeCanvas"></canvas>
-    
     <h2>Block 888,888</h2>
     <div id="countdown-container">
         <div id="countdown">Loading...</div>
     </div>
 
     <div id="current-block">CURRENT BLOCK: Fetching...</div>
-    
-    <div id="progress-container">
-        <div id="progress-bar"></div>
-    </div>
     
     <div id="estimated-arrival">ESTIMATED ARRIVAL: Calculating...</div>
 
@@ -149,4 +114,18 @@
                 let response = await fetch('https://mempool.space/api/blocks/tip/height');
                 let currentHeight = await response.json();
                 if (!currentHeight) return;
-                document.getElementById("current-block").innerText =
+                document.getElementById("current-block").innerText = `CURRENT BLOCK: ${currentHeight}`;
+            } catch (error) {
+                console.error("Error fetching block data:", error);
+            }
+        }
+
+        async function updateCountdown() {
+            await fetchBlockData();
+            setInterval(fetchBlockData, 30000);
+        }
+
+        document.addEventListener("DOMContentLoaded", updateCountdown);
+    </script>
+</body>
+</html>
