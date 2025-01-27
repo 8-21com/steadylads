@@ -96,9 +96,23 @@
         #footer a:hover {
             color: #FF9900; /* Turns orange on hover */
         }
+
+        /* Canvas for Elder Futhark Rune Effect */
+        #runeCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            opacity: 0.28; /* Slightly more visible */
+            z-index: -1;
+        }
     </style>
 </head>
 <body>
+    <canvas id="runeCanvas"></canvas>
+
     <h2>Block 888,888</h2>
     <div id="countdown-container">
         <div id="countdown">LOADING...</div>
@@ -136,11 +150,36 @@
                 let options = { year: 'numeric', month: 'long', day: 'numeric' };
                 let estimatedArrivalDate = targetDate.toLocaleDateString('en-US', options).toUpperCase();
                 document.getElementById("estimated-arrival").innerText = `ESTIMATED ARRIVAL: ${estimatedArrivalDate}`;
+
+                updateTimer(targetDate);
             } catch (error) {
                 console.error("Error fetching block data:", error);
                 document.getElementById("current-block").innerText = "CURRENT BLOCK: ERROR";
                 document.getElementById("estimated-arrival").innerText = "ESTIMATED ARRIVAL: UNKNOWN";
             }
+        }
+
+        function updateTimer(targetDate) {
+            function timerTick() {
+                let now = new Date();
+                let timeDifference = targetDate - now;
+
+                if (timeDifference < 0) {
+                    document.getElementById("countdown").innerText = "BLOCK 888,888 REACHED!";
+                    return;
+                }
+
+                let days = Math.floor(timeDifference / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((timeDifference / (1000 * 60 * 60)) % 24);
+                let minutes = Math.floor((timeDifference / (1000 * 60)) % 60);
+                let seconds = Math.floor((timeDifference / 1000) % 60);
+
+                document.getElementById("countdown").innerText = `${days}D ${hours}H ${minutes}M ${seconds}S`;
+
+                setTimeout(timerTick, 1000);
+            }
+
+            timerTick();
         }
 
         async function updateCountdown() {
@@ -149,6 +188,45 @@
         }
 
         document.addEventListener("DOMContentLoaded", updateCountdown);
+
+        /* Falling Runes Effect */
+        const runes = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ".split("");
+        const canvas = document.getElementById("runeCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        let runeSymbols = [];
+        for (let i = 0; i < 50; i++) {
+            runeSymbols.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                rune: runes[Math.floor(Math.random() * runes.length)],
+                speed: Math.random() * 1.5 + 0.5,
+            });
+        }
+
+        function drawRunes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
+            ctx.font = "30px Courier New";
+
+            runeSymbols.forEach((runeObj) => {
+                ctx.fillText(runeObj.rune, runeObj.x, runeObj.y);
+                runeObj.y += runeObj.speed;
+                if (runeObj.y > canvas.height) runeObj.y = 0;
+            });
+
+            requestAnimationFrame(drawRunes);
+        }
+
+        drawRunes();
     </script>
 </body>
 </html>
