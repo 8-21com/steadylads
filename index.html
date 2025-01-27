@@ -50,20 +50,36 @@
             text-transform: uppercase;
         }
 
+        /* Slightly Brighter and Pulsating Effect for Current Block */
+        #current-block {
+            font-size: 16px;
+            font-weight: 900;
+            color: #888888; /* Slightly Brighter */
+            margin-top: 10px;
+            text-transform: uppercase;
+            animation: pulse 2s infinite alternate ease-in-out;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            100% { opacity: 0.7; } /* Subtle fade effect */
+        }
+
+        /* Footer Styling */
         #footer {
-            font-size: 15px; /* Increased by 5% */
+            font-size: 16px; /* Increased by 10% */
             font-weight: 900;
             color: #AAAAAA;
-            margin-top: 40px; /* Brought slightly higher */
+            margin-top: 40px;
             position: absolute;
-            bottom: 50px; /* Raised the footer */
+            bottom: 70px; /* Raised Footer */
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
         }
 
         #footer div {
-            margin-bottom: 10px; /* Added more spacing between text and link */
+            margin-bottom: 12px; /* Extra Spacing Between Text & Link */
         }
 
         #footer a {
@@ -73,7 +89,7 @@
             border: 2px solid #4D4C4C;
             background-color: #000000;
             transition: color 0.3s ease-in-out;
-            font-size: 15px; /* Increased by 5% */
+            font-size: 16px; /* Increased by 10% */
         }
 
         #footer a:hover {
@@ -87,7 +103,7 @@
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            opacity: 0.28; /* Increased rune visibility slightly */
+            opacity: 0.28; /* Slightly more visible */
             z-index: -1;
         }
     </style>
@@ -101,7 +117,7 @@
     </div>
 
     <div id="estimated-arrival" class="info-text">Estimated Arrival: Calculating...</div>
-    <div id="current-block" class="info-text">Current Block: Fetching...</div>
+    <div id="current-block">Current Block: Fetching...</div>
 
     <div id="footer">
         <div>Unofficial Countdown</div>
@@ -196,7 +212,7 @@
 
         function drawRunes() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.28)"; /* Slightly more visible */
+            ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
             ctx.font = "30px Courier New";
 
             runeSymbols.forEach((runeObj) => {
