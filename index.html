@@ -37,15 +37,23 @@
             width: fit-content;
         }
 
-        /* Countdown display */
+        /* Countdown display (Orange + Pulsating) */
         #countdown {
             font-size: 32px;
             font-weight: 900;
             color: #FF9900;
             padding: 10px;
             display: inline-block;
-            text-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
+            text-shadow: 0 0 10px rgba(255, 153, 0, 0.8);
             font-family: 'Courier New', Courier, monospace;
+            animation: pulse 1.5s infinite ease-in-out;
+        }
+
+        /* Pulsating Effect */
+        @keyframes pulse {
+            0% { opacity: 1; text-shadow: 0 0 10px rgba(255, 153, 0, 1); }
+            50% { opacity: 0.7; text-shadow: 0 0 20px rgba(255, 153, 0, 0.7); }
+            100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 153, 0, 1); }
         }
 
         /* Estimated arrival and current block text */
@@ -88,27 +96,12 @@
         #footer a:hover {
             color: #FF9900; /* Turns orange on hover */
         }
-
-        /* Canvas for Elder Futhark Rune Effect */
-        #runeCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            pointer-events: none;
-            opacity: 0.28; /* Slightly more visible */
-            z-index: -1;
-        }
-
     </style>
 </head>
 <body>
-    <canvas id="runeCanvas"></canvas>
-
     <h2>Block 888,888</h2>
     <div id="countdown-container">
-        <div id="countdown"></div>
+        <div id="countdown">LOADING...</div>
     </div>
 
     <div id="estimated-arrival" class="info-text">ESTIMATED ARRIVAL: CALCULATING...</div>
@@ -156,45 +149,6 @@
         }
 
         document.addEventListener("DOMContentLoaded", updateCountdown);
-
-        /* Falling Runes Effect */
-        const runes = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ".split("");
-        const canvas = document.getElementById("runeCanvas");
-        const ctx = canvas.getContext("2d");
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-
-        window.addEventListener("resize", resizeCanvas);
-        resizeCanvas();
-
-        let runeSymbols = [];
-        for (let i = 0; i < 50; i++) {
-            runeSymbols.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                rune: runes[Math.floor(Math.random() * runes.length)],
-                speed: Math.random() * 1.5 + 0.5,
-            });
-        }
-
-        function drawRunes() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
-            ctx.font = "30px Courier New";
-
-            runeSymbols.forEach((runeObj) => {
-                ctx.fillText(runeObj.rune, runeObj.x, runeObj.y);
-                runeObj.y += runeObj.speed;
-                if (runeObj.y > canvas.height) runeObj.y = 0;
-            });
-
-            requestAnimationFrame(drawRunes);
-        }
-
-        drawRunes();
     </script>
 </body>
 </html>
