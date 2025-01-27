@@ -82,8 +82,21 @@
         /* Soft Glowing Effect */
         @keyframes softGlow {
             0% { opacity: 1; text-shadow: 0 0 5px rgba(170, 170, 170, 0.6); }
-            50% { opacity: 0.8; text-shadow: 0 0 15px rgba(170, 170, 170, 0.3); }
+            50% { opacity: 0.9; text-shadow: 0 0 10px rgba(170, 170, 170, 0.3); }
             100% { opacity: 1; text-shadow: 0 0 5px rgba(170, 170, 170, 0.6); }
+        }
+
+        /* Footer Styling */
+        #footer {
+            font-size: 18px;
+            font-weight: 900;
+            color: #AAAAAA;
+            margin-top: 50px;
+            text-align: center;
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
         }
     </style>
 </head>
@@ -95,6 +108,12 @@
 
     <div id="estimated-arrival">ESTIMATED ARRIVAL: Calculating...</div>
     <div id="current-block">CURRENT BLOCK: Fetching...</div>
+
+    <!-- Centered Footer -->
+    <div id="footer">
+        <div>UNOFFICIAL COUNTDOWN</div>
+        <a href="https://docs.8-21.com/the-history-of-rsic/project-updates#block-888-888" target="_self">8-21.com</a>
+    </div>
 
     <script>
         async function fetchBlockData() {
