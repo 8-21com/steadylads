@@ -51,15 +51,19 @@
         }
 
         #footer {
-            font-size: 14px;
+            font-size: 15px; /* Increased by 5% */
             font-weight: 900;
             color: #AAAAAA;
-            margin-top: 50px;
+            margin-top: 40px; /* Brought slightly higher */
             position: absolute;
-            bottom: 30px;
+            bottom: 50px; /* Raised the footer */
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
+        }
+
+        #footer div {
+            margin-bottom: 10px; /* Added more spacing between text and link */
         }
 
         #footer a {
@@ -69,7 +73,7 @@
             border: 2px solid #4D4C4C;
             background-color: #000000;
             transition: color 0.3s ease-in-out;
-            font-size: 14px;
+            font-size: 15px; /* Increased by 5% */
         }
 
         #footer a:hover {
@@ -83,7 +87,7 @@
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            opacity: 0.2;
+            opacity: 0.28; /* Increased rune visibility slightly */
             z-index: -1;
         }
     </style>
@@ -192,7 +196,7 @@
 
         function drawRunes() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.28)"; /* Slightly more visible */
             ctx.font = "30px Courier New";
 
             runeSymbols.forEach((runeObj) => {
