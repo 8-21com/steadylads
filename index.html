@@ -24,14 +24,14 @@
             font-weight: 900;
         }
 
-        /* Countdown Box: Wider and Consistently Sized */
+        /* Countdown Box: Wider and Fixed Size */
         #countdown-container {
             display: inline-block;
             padding: 20px;
             border: 2px solid #4D4C4C;
             background-color: #000000;
             margin-top: 20px;
-            width: 300px; /* Fixed width to prevent resizing */
+            width: 300px; /* Fixed width */
             text-align: center;
         }
 
@@ -53,11 +53,11 @@
             text-transform: uppercase;
         }
 
-        /* Slightly Brighter and Pulsating Effect for Current Block */
+        /* Brighter and Pulsating Effect for Current Block */
         #current-block {
             font-size: 16px;
             font-weight: 900;
-            color: #888888; /* Slightly Brighter */
+            color: #888888;
             margin-top: 10px;
             text-transform: uppercase;
             animation: pulse 2s infinite alternate ease-in-out;
@@ -70,20 +70,20 @@
 
         /* Footer Styling */
         #footer {
-            font-size: 18px; /* Increased by 10% */
+            font-size: 18px;
             font-weight: 900;
             color: #AAAAAA;
             margin-top: 40px;
             position: absolute;
-            bottom: 70px; /* Raised Footer */
+            bottom: 70px;
             left: 50%;
             transform: translateX(-50%);
             text-align: center;
         }
 
         #footer div {
-            margin-bottom: 15px; /* Increased space between text & link */
-            text-transform: uppercase; /* Ensures "UNOFFICIAL COUNTDOWN" is all caps */
+            margin-bottom: 15px;
+            text-transform: uppercase;
         }
 
         #footer a {
@@ -93,7 +93,7 @@
             border: 2px solid #4D4C4C;
             background-color: #000000;
             transition: color 0.3s ease-in-out;
-            font-size: 18px; /* Increased by 10% */
+            font-size: 18px;
         }
 
         #footer a:hover {
@@ -107,7 +107,7 @@
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            opacity: 0.28; /* Slightly more visible */
+            opacity: 0.28;
             z-index: -1;
         }
     </style>
@@ -131,6 +131,7 @@
     <script>
         const targetBlock = 888888;
         const avgBlockTime = 10 * 60 * 1000; // 10 min per block
+        let estimatedTimeLeft = 0; // Store the estimated time left globally
 
         async function fetchBlockData() {
             try {
@@ -150,12 +151,11 @@
                     return;
                 }
 
-                let estimatedTimeLeft = blocksLeft * avgBlockTime;
+                estimatedTimeLeft = blocksLeft * avgBlockTime;
                 let targetDate = new Date(Date.now() + estimatedTimeLeft);
                 let estimatedArrivalDate = targetDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
                 document.getElementById("estimated-arrival").innerText = `Estimated Arrival: ${estimatedArrivalDate}`;
-                updateCountdown(estimatedTimeLeft);
             } catch (error) {
                 console.error("Error fetching block data:", error);
                 document.getElementById("current-block").innerText = "Current Block: ERROR";
@@ -164,9 +164,9 @@
             }
         }
 
-        function updateCountdown(timeLeft) {
-            function update() {
-                let seconds = Math.floor(timeLeft / 1000);
+        function updateCountdown() {
+            function tick() {
+                let seconds = Math.floor(estimatedTimeLeft / 1000);
                 let days = Math.floor(seconds / (3600 * 24));
                 seconds %= 3600 * 24;
                 let hours = Math.floor(seconds / 3600);
@@ -176,16 +176,17 @@
 
                 document.getElementById("countdown").innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-                if (timeLeft > 0) {
-                    timeLeft -= 1000;
-                    setTimeout(update, 1000);
+                if (estimatedTimeLeft > 0) {
+                    estimatedTimeLeft -= 1000;
+                    setTimeout(tick, 1000);
                 }
             }
-            update();
+            tick();
         }
 
         async function startCountdown() {
             await fetchBlockData();
+            updateCountdown();
             setInterval(fetchBlockData, 30000);
         }
 
