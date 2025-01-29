@@ -24,14 +24,13 @@
             font-weight: 900;
         }
 
-        /* Countdown Box: Wider and Fixed Size with 1px Border */
         #countdown-container {
             display: inline-block;
             padding: 20px;
             border: 1px solid #4D4C4C;
             background-color: #000000;
             margin-top: 20px;
-            width: 300px; /* Fixed width */
+            width: 300px;
             text-align: center;
         }
 
@@ -42,8 +41,8 @@
             padding: 10px;
             display: block;
             text-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
-            min-width: 250px; /* Prevents width fluctuation */
-            white-space: nowrap; /* Ensures countdown remains in one line */
+            min-width: 250px;
+            white-space: nowrap;
         }
 
         .info-text {
@@ -54,7 +53,6 @@
             text-transform: uppercase;
         }
 
-        /* Brighter and Pulsating Effect for Current Block */
         #current-block {
             font-size: 16px;
             font-weight: 900;
@@ -69,7 +67,6 @@
             100% { opacity: 0.7; }
         }
 
-        /* Footer Styling */
         #footer {
             font-size: 18px;
             font-weight: 900;
@@ -132,8 +129,9 @@
     <script>
         const targetBlock = 888888;
         const avgBlockTime = 10 * 60 * 1000;
-
         let estimatedTimeLeft = 0;
+        let lastFetchTime = Date.now();
+        let lastKnownBlockHeight = 0;
 
         async function fetchBlockData() {
             try {
@@ -146,18 +144,24 @@
 
                 document.getElementById("current-block").innerText = `Current Block: ${currentHeight}`;
 
-                let blocksLeft = targetBlock - currentHeight;
-                if (blocksLeft <= 0) {
-                    document.getElementById("countdown").innerText = "BLOCK REACHED!";
-                    document.getElementById("estimated-arrival").innerText = "Estimated Arrival: Achieved";
-                    return;
+                if (currentHeight !== lastKnownBlockHeight) {
+                    lastKnownBlockHeight = currentHeight;
+
+                    let blocksLeft = targetBlock - currentHeight;
+                    if (blocksLeft <= 0) {
+                        document.getElementById("countdown").innerText = "BLOCK REACHED!";
+                        document.getElementById("estimated-arrival").innerText = "Estimated Arrival: Achieved";
+                        return;
+                    }
+
+                    estimatedTimeLeft = blocksLeft * avgBlockTime;
+                    lastFetchTime = Date.now();
+
+                    let targetDate = new Date(Date.now() + estimatedTimeLeft);
+                    let estimatedArrivalDate = targetDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+
+                    document.getElementById("estimated-arrival").innerText = `Estimated Arrival: ${estimatedArrivalDate}`;
                 }
-
-                estimatedTimeLeft = blocksLeft * avgBlockTime;
-                let targetDate = new Date(Date.now() + estimatedTimeLeft);
-                let estimatedArrivalDate = targetDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
-                document.getElementById("estimated-arrival").innerText = `Estimated Arrival: ${estimatedArrivalDate}`;
             } catch (error) {
                 console.error("Error fetching block data:", error);
                 document.getElementById("current-block").innerText = "Current Block: ERROR";
@@ -168,7 +172,10 @@
 
         function updateCountdown() {
             function tick() {
-                let seconds = Math.floor(estimatedTimeLeft / 1000);
+                let now = Date.now();
+                let adjustedTimeLeft = estimatedTimeLeft - (now - lastFetchTime);
+
+                let seconds = Math.floor(adjustedTimeLeft / 1000);
                 let days = Math.floor(seconds / (3600 * 24));
                 seconds %= 3600 * 24;
                 let hours = Math.floor(seconds / 3600);
@@ -178,8 +185,7 @@
 
                 document.getElementById("countdown").innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-                if (estimatedTimeLeft > 0) {
-                    estimatedTimeLeft -= 1000;
+                if (adjustedTimeLeft > 0) {
                     setTimeout(tick, 1000);
                 }
             }
@@ -189,12 +195,12 @@
         async function startCountdown() {
             await fetchBlockData();
             updateCountdown();
-            setInterval(fetchBlockData, 30000);
+            setInterval(fetchBlockData, 60000);
         }
 
         document.addEventListener("DOMContentLoaded", startCountdown);
 
-        /* Rune Effect */
+        // 🔮 Rune Background Animation Restored
         const runes = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ".split("");
         const canvas = document.getElementById("runeCanvas");
         const ctx = canvas.getContext("2d");
@@ -222,10 +228,10 @@
             ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
             ctx.font = "30px Courier New";
 
-            runeSymbols.forEach((runeObj) => {
-                ctx.fillText(runeObj.rune, runeObj.x, runeObj.y);
-                runeObj.y += runeObj.speed;
-                if (runeObj.y > canvas.height) runeObj.y = 0;
+            runeSymbols.forEach(rune => {
+                ctx.fillText(rune.rune, rune.x, rune.y);
+                rune.y += rune.speed;
+                if (rune.y > canvas.height) rune.y = 0;
             });
 
             requestAnimationFrame(drawRunes);
