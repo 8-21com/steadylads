@@ -12,6 +12,11 @@
             background-color: #000000;
             color: #FFFFFF;
             overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100vh;
+            position: relative;
         }
 
         h2 {
@@ -22,6 +27,17 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 900;
+            z-index: 2;
+        }
+
+        .center-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-grow: 1;
+            position: relative;
+            z-index: 2;
         }
 
         #countdown-container {
@@ -29,7 +45,6 @@
             padding: 20px;
             border: 1px solid #4D4C4C;
             background-color: #000000;
-            margin-top: 20px;
             width: 300px;
             text-align: center;
         }
@@ -45,15 +60,7 @@
             white-space: nowrap;
         }
 
-        .info-text {
-            font-size: 16px;
-            font-weight: 900;
-            color: #4D4C4C;
-            margin-top: 10px;
-            text-transform: uppercase;
-        }
-
-        #current-block {
+        #estimated-arrival, #current-block, #blocks-left {
             font-size: 16px;
             font-weight: 900;
             color: #888888;
@@ -71,12 +78,9 @@
             font-size: 18px;
             font-weight: 900;
             color: #AAAAAA;
-            margin-top: 40px;
-            position: absolute;
-            bottom: 70px;
-            left: 50%;
-            transform: translateX(-50%);
+            margin-bottom: 20px;
             text-align: center;
+            z-index: 2;
         }
 
         #footer div {
@@ -98,6 +102,7 @@
             color: #FF9900;
         }
 
+        /* Rune Animation Background */
         #runeCanvas {
             position: fixed;
             top: 0;
@@ -106,7 +111,7 @@
             height: 100vh;
             pointer-events: none;
             opacity: 0.28;
-            z-index: -1;
+            z-index: 1;
         }
     </style>
 </head>
@@ -114,12 +119,15 @@
     <canvas id="runeCanvas"></canvas>
 
     <h2>Block 888,888</h2>
-    <div id="countdown-container">
-        <div id="countdown">Loading...</div>
-    </div>
 
-    <div id="estimated-arrival" class="info-text">Estimated Arrival: Calculating...</div>
-    <div id="current-block">Current Block: Fetching...</div>
+    <div class="center-container">
+        <div id="countdown-container">
+            <div id="countdown">Loading...</div>
+        </div>
+        <div id="estimated-arrival">Estimated Arrival: Calculating...</div>
+        <div id="current-block">Current Block: Fetching...</div>
+        <div id="blocks-left">Blocks Left: Calculating...</div>
+    </div>
 
     <div id="footer">
         <div>UNOFFICIAL COUNTDOWN</div>
@@ -143,11 +151,12 @@
                 }
 
                 document.getElementById("current-block").innerText = `Current Block: ${currentHeight}`;
+                let blocksLeft = targetBlock - currentHeight;
+                document.getElementById("blocks-left").innerText = `Blocks Left: ${blocksLeft}`;
 
                 if (currentHeight !== lastKnownBlockHeight) {
                     lastKnownBlockHeight = currentHeight;
 
-                    let blocksLeft = targetBlock - currentHeight;
                     if (blocksLeft <= 0) {
                         document.getElementById("countdown").innerText = "BLOCK REACHED!";
                         document.getElementById("estimated-arrival").innerText = "Estimated Arrival: Achieved";
@@ -158,13 +167,13 @@
                     lastFetchTime = Date.now();
 
                     let targetDate = new Date(Date.now() + estimatedTimeLeft);
-                    let estimatedArrivalDate = targetDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-
+                    let estimatedArrivalDate = targetDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }).replace(/,\s+/, ', ');
                     document.getElementById("estimated-arrival").innerText = `Estimated Arrival: ${estimatedArrivalDate}`;
                 }
             } catch (error) {
                 console.error("Error fetching block data:", error);
                 document.getElementById("current-block").innerText = "Current Block: ERROR";
+                document.getElementById("blocks-left").innerText = "Blocks Left: UNKNOWN";
                 document.getElementById("estimated-arrival").innerText = "Estimated Arrival: UNKNOWN";
                 document.getElementById("countdown").innerText = "N/A";
             }
@@ -200,7 +209,7 @@
 
         document.addEventListener("DOMContentLoaded", startCountdown);
 
-        // 🔮 Rune Background Animation Restored
+        // Restored Rune Background Animation
         const runes = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ".split("");
         const canvas = document.getElementById("runeCanvas");
         const ctx = canvas.getContext("2d");
@@ -213,27 +222,18 @@
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas();
 
-        let runeSymbols = [];
-        for (let i = 0; i < 50; i++) {
-            runeSymbols.push({
-                x: Math.random() * canvas.width,
-                y: Math.random() * canvas.height,
-                rune: runes[Math.floor(Math.random() * runes.length)],
-                speed: Math.random() * 1.5 + 0.5,
-            });
-        }
+        let runeSymbols = Array.from({ length: 50 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            rune: runes[Math.floor(Math.random() * runes.length)],
+            speed: Math.random() * 1.5 + 0.5,
+        }));
 
         function drawRunes() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = "rgba(255, 255, 255, 0.28)";
             ctx.font = "30px Courier New";
-
-            runeSymbols.forEach(rune => {
-                ctx.fillText(rune.rune, rune.x, rune.y);
-                rune.y += rune.speed;
-                if (rune.y > canvas.height) rune.y = 0;
-            });
-
+            runeSymbols.forEach(r => { ctx.fillText(r.rune, r.x, r.y); r.y = (r.y + r.speed) % canvas.height; });
             requestAnimationFrame(drawRunes);
         }
 
