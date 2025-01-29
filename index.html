@@ -28,7 +28,7 @@
         #countdown-container {
             display: inline-block;
             padding: 20px;
-            border: 1px solid #4D4C4C; /* Reduced border width */
+            border: 1px solid #4D4C4C;
             background-color: #000000;
             margin-top: 20px;
             width: 300px; /* Fixed width */
@@ -43,6 +43,7 @@
             display: block;
             text-shadow: 0 0 5px rgba(255, 153, 0, 0.5);
             min-width: 250px; /* Prevents width fluctuation */
+            white-space: nowrap; /* Ensures countdown remains in one line */
         }
 
         .info-text {
@@ -65,7 +66,7 @@
 
         @keyframes pulse {
             0% { opacity: 1; }
-            100% { opacity: 0.7; } /* Subtle fade effect */
+            100% { opacity: 0.7; }
         }
 
         /* Footer Styling */
@@ -82,7 +83,7 @@
         }
 
         #footer div {
-            margin-bottom: 20px; /* Increased spacing between "UNOFFICIAL COUNTDOWN" and the link */
+            margin-bottom: 20px;
             text-transform: uppercase;
         }
 
@@ -90,7 +91,7 @@
             text-decoration: none;
             color: #4D4C4C;
             padding: 5px 15px;
-            border: 1px solid #4D4C4C; /* Reduced border width */
+            border: 1px solid #4D4C4C;
             background-color: #000000;
             transition: color 0.3s ease-in-out;
             font-size: 18px;
@@ -130,8 +131,9 @@
 
     <script>
         const targetBlock = 888888;
-        const avgBlockTime = 10 * 60 * 1000; // 10 min per block
-        let estimatedTimeLeft = 0; // Store the estimated time left globally
+        const avgBlockTime = 10 * 60 * 1000;
+
+        let estimatedTimeLeft = 0;
 
         async function fetchBlockData() {
             try {
