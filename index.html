@@ -22,6 +22,8 @@
             text-transform: uppercase;
             letter-spacing: 2px;
             font-weight: 900;
+            position: relative;
+            z-index: 2;
         }
 
         #countdown-container {
@@ -32,6 +34,8 @@
             margin-top: 20px;
             width: 300px;
             text-align: center;
+            position: relative;
+            z-index: 2;
         }
 
         #countdown {
@@ -52,6 +56,8 @@
             margin-top: 10px;
             text-transform: uppercase;
             animation: pulse 2s infinite alternate ease-in-out;
+            position: relative;
+            z-index: 2;
         }
 
         @keyframes pulse {
@@ -63,23 +69,23 @@
             font-size: 18px;
             font-weight: 900;
             color: #AAAAAA;
-            margin-top: 40px;
-            position: absolute;
-            bottom: 70px;
-            left: 50%;
-            transform: translateX(-50%);
+            width: 100%;
+            position: fixed;
+            bottom: 70px; /* Slightly raised footer */
+            left: 0;
             text-align: center;
+            z-index: 2;
         }
 
         #footer div {
-            margin-bottom: 20px;
+            margin-bottom: 30px; /* More space between "UNOFFICIAL COUNTDOWN" and the link */
             text-transform: uppercase;
         }
 
         #footer a {
             text-decoration: none;
             color: #4D4C4C;
-            padding: 5px 15px;
+            padding: 8px 20px;
             border: 1px solid #4D4C4C;
             background-color: #000000;
             transition: color 0.3s ease-in-out;
@@ -90,6 +96,7 @@
             color: #FF9900;
         }
 
+        /* Fully Restored Rune Background Animation */
         #runeCanvas {
             position: fixed;
             top: 0;
@@ -97,8 +104,8 @@
             width: 100vw;
             height: 100vh;
             pointer-events: none;
-            opacity: 0.28;
-            z-index: -1;
+            opacity: 0.2;
+            z-index: 1;
         }
     </style>
 </head>
@@ -193,6 +200,36 @@
         }
 
         document.addEventListener("DOMContentLoaded", startCountdown);
+
+        // Fully Restored Smooth Rune Animation
+        const runes = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ".split("");
+        const canvas = document.getElementById("runeCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas();
+
+        let runeSymbols = Array.from({ length: 50 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            rune: runes[Math.floor(Math.random() * runes.length)],
+            speed: Math.random() * 1.5 + 0.5,
+        }));
+
+        function drawRunes() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.2)";
+            ctx.font = "30px Courier New";
+            runeSymbols.forEach(r => { ctx.fillText(r.rune, r.x, r.y); r.y = (r.y + r.speed) % canvas.height; });
+            requestAnimationFrame(drawRunes);
+        }
+
+        drawRunes();
     </script>
 </body>
 </html>
