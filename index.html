@@ -34,7 +34,7 @@
       font-weight: 900;
       color: #AAAAAA;
       text-transform: uppercase;
-      margin-bottom: 40px; /* Extra spacing for aesthetics */
+      margin-bottom: 40px;
     }
 
     /* Countdown Container */
@@ -95,9 +95,9 @@
       align-items: center;
     }
 
-    /* DATA COPIED line (above the button) */
+    /* DATA COPIED line */
     #copy-feedback {
-      font-size: 16px; 
+      font-size: 16px;
       font-weight: 900;
       color: #888888;
       text-transform: uppercase;
@@ -106,10 +106,10 @@
       margin-bottom: 10px;
     }
 
-    /* COPY DATA Button (with extra padding) */
+    /* COPY DATA Button */
     #copy-button {
-      padding: 10px 20px; /* Extra padding for aesthetics */
-      font-size: 16px; 
+      padding: 10px 20px;
+      font-size: 16px;
       font-weight: 900;
       color: #888888;
       background: none;
@@ -151,13 +151,11 @@
   </style>
 </head>
 <body>
-  <!-- Runes Canvas -->
+  <!-- Background -->
   <canvas id="runeCanvas"></canvas>
 
   <!-- Title -->
   <h2>Block 888,888</h2>
-
-  <!-- "UNOFFICIAL COUNTDOWN" below title -->
   <div id="unofficial-countdown">UNOFFICIAL COUNTDOWN</div>
 
   <!-- Countdown Container -->
@@ -165,7 +163,7 @@
     <div id="countdown">Loading...</div>
   </div>
 
-  <!-- Info Lines: Estimate, Current Block, Blocks Left -->
+  <!-- Info Lines -->
   <div id="estimate">Estimate: Calculating...</div>
   <div id="current-block">Current Block: Fetching...</div>
   <div id="blocks-left">Blocks Left: Calculating...</div>
@@ -179,57 +177,67 @@
     </a>
   </div>
 
+  <!-- Script Section -->
   <script>
-    /**
-     * ---------------------------
-     * BLOCK DATA + COUNTDOWN LOGIC
-     * ---------------------------
-     */
-    const targetBlock     = 888888;
-    const avgBlockTime    = 10 * 60 * 1000; 
-    let   estimatedTimeLeft = 0;
-    let   lastFetchTime   = Date.now();
+    const targetBlock = 888888;
+    const avgBlockTime = 10 * 60 * 1000; 
+    let estimatedTimeLeft = 0;
+    let lastFetchTime = Date.now();
 
-    // 1) Fetch from mempool.space
+    // 1) Fetch Block Data
     async function fetchBlockData() {
       try {
         const res = await fetch("https://mempool.space/api/blocks/tip/height");
         const currentHeight = await res.json();
 
-        // Current Block
-        document.getElementById("current-block").innerText
-          = `Current Block: ${currentHeight}`;
-
-        // Blocks Left
+        document.getElementById("current-block").innerText = `Current Block: ${currentHeight}`;
         const blocksLeft = targetBlock - currentHeight;
-        document.getElementById("blocks-left").innerText
-          = `Blocks Left: ${blocksLeft}`;
+        document.getElementById("blocks-left").innerText = `Blocks Left: ${blocksLeft}`;
 
-        // Time & Date
         estimatedTimeLeft = blocksLeft * avgBlockTime;
-        lastFetchTime     = Date.now();
+        lastFetchTime = Date.now();
 
         const targetDate = new Date(Date.now() + estimatedTimeLeft);
-        const estimateDate = targetDate
-          .toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })
-          .replace(/,\s+/, ", ");
+        const estimateDate = targetDate.toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" });
 
-        // Estimate
-        document.getElementById("estimate").innerText
-          = `Estimate: ${estimateDate}`;
+        document.getElementById("estimate").innerText = `Estimate: ${estimateDate}`;
       } catch (err) {
         console.error("Error fetching block data:", err);
       }
     }
 
-    // 2) Copy data with ASCII art
+    // 2) Countdown Timer (Visible on Webpage with Seconds)
+    let countdownWithoutSeconds = "";  // For copy-paste
+    function updateCountdown() {
+      const now = Date.now();
+      const timeElapsed = now - lastFetchTime;
+      const timeLeft = estimatedTimeLeft - timeElapsed;
+
+      if (timeLeft <= 0) {
+        document.getElementById("countdown").innerText = "🎱";
+        countdownWithoutSeconds = "Block Reached!";
+        return;
+      }
+
+      const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+      // Display seconds on the webpage
+      document.getElementById("countdown").innerText = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+      // For copy-paste (exclude seconds)
+      countdownWithoutSeconds = `${days}d ${hours}h ${minutes}m`;
+    }
+
+    // 3) Copy Data to Clipboard (No Seconds)
     const copyFeedback = document.getElementById("copy-feedback");
     document.getElementById("copy-button").addEventListener("click", () => {
-      const est       = document.getElementById("estimate").innerText.split(": ")[1];
-      const currBlk   = document.getElementById("current-block").innerText.split(": ")[1];
-      const blocksLeft= document.getElementById("blocks-left").innerText.split(": ")[1];
+      const est = document.getElementById("estimate").innerText.split(": ")[1];
+      const currBlk = document.getElementById("current-block").innerText.split(": ")[1];
+      const blocksLeft = document.getElementById("blocks-left").innerText.split(": ")[1];
 
-      // ASCII art in the copied text
       const discordText = `
 \`\`\`
 #      ____  _____ __________⛏
@@ -238,6 +246,7 @@
 #   / _, _/___/ // // /___
 #  /_/ |_|/____/___/\\____/
 #
+#  Countdown: ${countdownWithoutSeconds}
 #  Estimate: ${est}
 #  Current Block: ${currBlk}
 #  Blocks Left: ${blocksLeft}
@@ -246,59 +255,32 @@
 
       navigator.clipboard.writeText(discordText)
         .then(() => {
-          copyFeedback.style.opacity = 1; 
-          setTimeout(() => {
-            copyFeedback.style.opacity = 0;
-          }, 1000);
+          copyFeedback.style.opacity = 1;
+          setTimeout(() => { copyFeedback.style.opacity = 0; }, 1000);
         })
         .catch(err => console.error("Clipboard error:", err));
     });
 
-    // 3) Update the countdown timer every second
-    function updateCountdown() {
-      const now = Date.now();
-      const timeElapsed = now - lastFetchTime;
-      const timeLeft = estimatedTimeLeft - timeElapsed;
-
-      if (timeLeft <= 0) {
-        document.getElementById("countdown").innerText
-          = "🎱";
-        return;
-      }
-
-      const days    = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
-      const hours   = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-      const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
-      const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
-
-      document.getElementById("countdown").innerText
-        = `${days}d ${hours}h ${minutes}m ${seconds}s`;
-    }
-
-    // 4) Initialize data & intervals
+    // 4) Initialize Data & Timers
     fetchBlockData();
-    setInterval(fetchBlockData, 10 * 60 * 1000); // Refresh block data every 10 minutes
-    setInterval(updateCountdown, 1000);          // Update countdown every second
+    setInterval(fetchBlockData, 10 * 60 * 1000); // Refresh every 10 min
+    setInterval(updateCountdown, 1000);         // Update every second
 
     /**
-     * ---------------------------
-     * DOWNWARD RUNES BACKGROUND
-     * ---------------------------
+     * Runes Background Animation
      */
     const canvas = document.getElementById("runeCanvas");
-    const ctx    = canvas.getContext("2d");
-    const runes  = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ".split("");
+    const ctx = canvas.getContext("2d");
+    const runes = "ᚠᚢᚦᚨᚱᚲᚷᚹᚺᚾᛁᛃᛇᛈᛉᛊᛏᛒᛖᛗᛚᛜᛞᛟ".split("");
     let runeSymbols = [];
 
-    // Fit the canvas to the window
     function resizeCanvas() {
-      canvas.width  = window.innerWidth;
+      canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
     }
     window.addEventListener("resize", resizeCanvas);
     resizeCanvas();
 
-    // Create 50 runes that drift down
     for (let i = 0; i < 50; i++) {
       runeSymbols.push({
         x: Math.random() * canvas.width,
