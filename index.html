@@ -116,24 +116,36 @@
       margin-bottom: 10px;
     }
 
-    /* COPY DATA Button */
-    #copy-button {
-      padding: 15px 25px;
-      font-size: 16px;
-      font-weight: 900;
-      color: #888888;
-      background: none;
-      border: 1px solid #4D4C4C;
-      cursor: pointer;
-      text-transform: uppercase;
-      transition: color 0.3s ease-in-out;
-      font-family: inherit;
-      text-shadow: none;
-      margin: 0px 0;
-    }
-    #copy-button:hover {
-      color: #FF9900;
-    }
+/* COPY DATA Button */
+#copy-button {
+  padding: 10px 20px;
+  font-size: 16px;
+  font-weight: 900;
+  color: #888888;
+  background: none;
+  border: 1px solid #4D4C4C;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: color 0.3s ease-in-out;
+  font-family: inherit;
+  text-shadow: none;
+  margin: 0;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#copy-button:focus,
+#copy-button:active {
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0) !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+#copy-button:hover {
+    border-color: #6b6b6b;
+}
+
 
     /* 8-21.com link */
     #footer a {
@@ -319,143 +331,213 @@
     }
     drawRunes();
 
-    /******************************************************
-     * DYNAMIC PARAMETERS FOR CUBE & CANVAS
-     * We'll scale the cube to half size on screens < 600px
-     ******************************************************/
-    let sideLength = 100;
-    let offset = 30;
-    let amplitude = 40;
-    let canvasW = 200;
-    let canvasH = 250;
+/******************************************************
+ * DYNAMIC PARAMETERS FOR CUBE & CANVAS
+ * We'll scale the cube to half size on screens < 600px
+ ******************************************************/
+ let sideLength = 100;
+let offset = 30;
+let amplitude = 40;
+let canvasW = 200;
+let canvasH = 250;
 
-    function setCubeParams() {
-      // If screen is narrower than 600px => half the values
-      if (window.innerWidth < 600) {
-        sideLength = 50;    // half of 100
-        offset = 15;        // half of 30
-        amplitude = 20;     // half of 40
-        canvasW = 100;      // half of 200
-        canvasH = 125;      // half of 250
-      } else {
-        sideLength = 100;
-        offset = 30;
-        amplitude = 40;
-        canvasW = 200;
-        canvasH = 250;
-      }
-    }
+function setCubeParams() {
+  if (window.innerWidth < 600) {
+    sideLength = 50;
+    offset = 15;
+    amplitude = 20;
+    canvasW = 100;
+    canvasH = 125;
+  } else {
+    sideLength = 100;
+    offset = 30;
+    amplitude = 40;
+    canvasW = 200;
+    canvasH = 250;
+  }
+}
 
-    /**
-     * Draw the 3D Cube (Wireframe) with a Question Mark.
-     *  - Back face & connecting edges => partially transparent darker color
-     *  - Front face edges => solid lighter color
-     *  - Then place a question mark inside the front face
-     */
-    function drawCubeWithOffset(ctx, cubeOffsetY, qmOffsetY) {
-      // We'll use our global sideLength & offset
-      const s = sideLength;
-      const off = offset;
+/**
+ * Draws the cube with its original static colors,
+ * including the grey question mark.
+ */
+function drawCubeWithOffset(ctx, cubeOffsetY, qmOffsetY) {
+  const s = sideLength;
+  const off = offset;
+  const x = (ctx.canvas.width - s - off) / 2;
+  const y = (ctx.canvas.height - s + off) / 2 + cubeOffsetY;
+  
+  // Front face vertices
+  const A = { x: x,      y: y };
+  const B = { x: x + s,  y: y };
+  const C = { x: x + s,  y: y + s };
+  const D = { x: x,      y: y + s };
+  
+  // Back face vertices
+  const E = { x: x + off,     y: y - off };
+  const F = { x: x + s + off, y: y - off };
+  const G = { x: x + s + off, y: y + s - off };
+  const H = { x: x + off,     y: y + s - off };
 
-      // Center the cube inside the canvas and apply the cube's vertical offset
-      const x = (ctx.canvas.width - s - off) / 2;
-      const y = (ctx.canvas.height - s + off) / 2 + cubeOffsetY;
-      
-      // Front face vertices
-      const A = { x: x,      y: y };
-      const B = { x: x + s,  y: y };
-      const C = { x: x + s,  y: y + s };
-      const D = { x: x,      y: y + s };
-      
-      // Back face vertices
-      const E = { x: x + off,     y: y - off };
-      const F = { x: x + s + off, y: y - off };
-      const G = { x: x + s + off, y: y + s - off };
-      const H = { x: x + off,     y: y + s - off };
+  // Draw back face and connecting edges (static colors)
+  ctx.strokeStyle = "rgba(60, 60, 60, 1)";
+  ctx.lineWidth = 1;
+  ctx.beginPath();
+  ctx.moveTo(E.x, E.y);
+  ctx.lineTo(F.x, F.y);
+  ctx.lineTo(G.x, G.y);
+  ctx.lineTo(H.x, H.y);
+  ctx.closePath();
+  ctx.stroke();
+  
+  ctx.beginPath();
+  ctx.moveTo(A.x, A.y); ctx.lineTo(E.x, E.y);
+  ctx.moveTo(B.x, B.y); ctx.lineTo(F.x, F.y);
+  ctx.moveTo(C.x, C.y); ctx.lineTo(G.x, G.y);
+  ctx.moveTo(D.x, D.y); ctx.lineTo(H.x, H.y);
+  ctx.stroke();
+  
+  // Draw front face (static color)
+  ctx.strokeStyle = "#5c5a5a";
+  ctx.beginPath();
+  ctx.moveTo(A.x, A.y);
+  ctx.lineTo(B.x, B.y);
+  ctx.lineTo(C.x, C.y);
+  ctx.lineTo(D.x, D.y);
+  ctx.closePath();
+  ctx.stroke();
+  
+  // Draw the grey question mark
+  ctx.font = `${s * 0.69}px Play`;
+  ctx.fillStyle = "rgba(92, 90, 90, 1)";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText("?", A.x + s / 2, A.y + s / 2 + qmOffsetY);
+}
 
-      // 1) Back face + connecting edges (interior)
-      ctx.strokeStyle = "rgba(60, 60, 60, 1)"; 
-      ctx.lineWidth = 1;
+/**
+ * Draws a shimmering overlay with a golden gradient
+ * that moves continuously from completely off the left side
+ * of the cube to completely off the right. This function
+ * applies the effect both to the cube edges and the question mark.
+ */
+function drawCubeShimmer(ctx, cubeOffsetY, shimmerOffset, qmOffsetY) {
+  const s = sideLength;
+  const off = offset;
+  const x = (ctx.canvas.width - s - off) / 2;
+  const y = (ctx.canvas.height - s + off) / 2 + cubeOffsetY;
+  
+  ctx.save();
+  ctx.globalCompositeOperation = "lighter";
+  ctx.globalAlpha = 0.6;
+  
+  // Define a cycle for the shimmer: from -s (off left) to +s (off right)
+  const cycleDistance = 2 * s;
+  const t = (shimmerOffset % cycleDistance) / cycleDistance;
+  const shimmerX = -s + 2 * s * t;
+  
+  // Create a horizontal gradient for the cube edges.
+  const grad = ctx.createLinearGradient(x + shimmerX, y, x + shimmerX + s, y);
+  grad.addColorStop(0, "rgba(255, 215, 0, 0)");
+  grad.addColorStop(0.5, "rgba(255, 215, 0, 1)");
+  grad.addColorStop(1, "rgba(255, 215, 0, 0)");
+  
+  ctx.strokeStyle = grad;
+  ctx.lineWidth = 2;
+  
+  // Draw back face edges
+  ctx.beginPath();
+  ctx.moveTo(x + off, y - off);
+  ctx.lineTo(x + s + off, y - off);
+  ctx.lineTo(x + s + off, y + s - off);
+  ctx.lineTo(x + off, y + s - off);
+  ctx.closePath();
+  ctx.stroke();
+  
+  // Draw connecting edges between front and back faces
+  ctx.beginPath();
+  ctx.moveTo(x, y); ctx.lineTo(x + off, y - off);
+  ctx.moveTo(x + s, y); ctx.lineTo(x + s + off, y - off);
+  ctx.moveTo(x + s, y + s); ctx.lineTo(x + s + off, y + s - off);
+  ctx.moveTo(x, y + s); ctx.lineTo(x + off, y + s - off);
+  ctx.stroke();
+  
+  // Draw front face edges
+  ctx.beginPath();
+  ctx.moveTo(x, y);
+  ctx.lineTo(x + s, y);
+  ctx.lineTo(x + s, y + s);
+  ctx.lineTo(x, y + s);
+  ctx.closePath();
+  ctx.stroke();
+  
+  // Draw the shimmering question mark overlay.
+  // Here we incorporate shimmerX into its gradient for the left-to-right effect.
+  ctx.font = `${s * 0.69}px Play`;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  const textX = x + s / 2;
+  const textY = y + s / 2 + qmOffsetY;
+  const gradText = ctx.createLinearGradient(textX - s / 2 + shimmerX, textY, textX + s / 2 + shimmerX, textY);
+  gradText.addColorStop(0, "rgba(255, 215, 0, 0)");
+  gradText.addColorStop(0.5, "rgba(255, 215, 0, 1)");
+  gradText.addColorStop(1, "rgba(255, 215, 0, 0)");
+  ctx.fillStyle = gradText;
+  ctx.fillText("?", textX, textY);
+  
+  ctx.restore();
+}
 
-      // Back face
-      ctx.beginPath();
-      ctx.moveTo(E.x, E.y);
-      ctx.lineTo(F.x, F.y);
-      ctx.lineTo(G.x, G.y);
-      ctx.lineTo(H.x, H.y);
-      ctx.closePath();
-      ctx.stroke();
+/**
+ * Animates the cube with its floating motion and the continuous
+ * golden shimmer overlay applied to both the cube and the question mark.
+ */
+function animateCube() {
+  const cubeCanvas = document.getElementById("cubeCanvas");
+  const ctx = cubeCanvas.getContext("2d");
+  
+  setCubeParams();
+  cubeCanvas.width = canvasW;
+  cubeCanvas.height = canvasH;
+  
+  let startTime = null;
+  let questionMarkOffset = 0;
+  let shimmerOffset = 0;
+  
+  function animate(time) {
+    setCubeParams();
+    cubeCanvas.width = canvasW;
+    cubeCanvas.height = canvasH;
+    if (!startTime) startTime = time;
+    const elapsed = time - startTime;
+    
+    // Increase shimmerOffset steadily to drive the effect.
+    shimmerOffset += 0.5; // Adjust this for shimmer speed
+    
+    // Cube vertical floating animation.
+    const frequency = 0.000185;
+    const cubeOffsetY = amplitude * Math.sin(elapsed * frequency * 2 * Math.PI);
+    
+    // Smooth counter-motion for the question mark.
+    const targetQMOffset = -cubeOffsetY * 0.25;
+    questionMarkOffset += (targetQMOffset - questionMarkOffset) * 0.03;
+    
+    ctx.clearRect(0, 0, cubeCanvas.width, cubeCanvas.height);
+    
+    // Draw the static cube with its grey question mark.
+    drawCubeWithOffset(ctx, cubeOffsetY, questionMarkOffset);
+    
+    // Draw the shimmering overlay on both the cube and the question mark.
+    drawCubeShimmer(ctx, cubeOffsetY, shimmerOffset, questionMarkOffset);
+    
+    requestAnimationFrame(animate);
+  }
+  
+  requestAnimationFrame(animate);
+}
 
-      // Connecting edges
-      ctx.beginPath();
-      ctx.moveTo(A.x, A.y); ctx.lineTo(E.x, E.y);
-      ctx.moveTo(B.x, B.y); ctx.lineTo(F.x, F.y);
-      ctx.moveTo(C.x, C.y); ctx.lineTo(G.x, G.y);
-      ctx.moveTo(D.x, D.y); ctx.lineTo(H.x, H.y);
-      ctx.stroke();
+animateCube();
 
-      // 2) Front face
-      ctx.strokeStyle = "#5c5a5a";
-      ctx.beginPath();
-      ctx.moveTo(A.x, A.y);
-      ctx.lineTo(B.x, B.y);
-      ctx.lineTo(C.x, C.y);
-      ctx.lineTo(D.x, D.y);
-      ctx.closePath();
-      ctx.stroke();
-
-      // 3) Question mark
-      ctx.font = `${s * 0.69}px Play`; // scale question mark size based on sideLength
-      ctx.fillStyle = "rgba(92, 90, 90, 1)"; 
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("?", A.x + s / 2, A.y + s / 2 + qmOffsetY);
-    }
-
-    /**
-     * Animate the cube to float up and down gently 
-     * while the question mark moves with a slight counter motion.
-     */
-    function animateCube() {
-      const cubeCanvas = document.getElementById("cubeCanvas");
-      const ctx = cubeCanvas.getContext("2d");
-
-      // Re-check screen size & set parameters
-      setCubeParams();
-
-      // Resize the canvas
-      cubeCanvas.width = canvasW;
-      cubeCanvas.height = canvasH;
-
-      let startTime = null;
-      let questionMarkOffset = 0; // current offset for the question mark
-
-      function animate(time) {
-        // If user resized the screen mid-animation, re-check
-        setCubeParams();
-        cubeCanvas.width = canvasW;
-        cubeCanvas.height = canvasH;
-
-        if (!startTime) startTime = time;
-        const elapsed = time - startTime;
-
-        // Vertical offset for the cube
-        const frequency = 0.000185; 
-        const cubeOffsetY = amplitude * Math.sin(elapsed * frequency * 2 * Math.PI);
-
-        // Question mark moves in counter-phase with smaller amplitude
-        const targetQMOffset = -cubeOffsetY * 0.25;
-        // Ease the question mark's offset for a subtle lag effect
-        questionMarkOffset += (targetQMOffset - questionMarkOffset) * 0.03;
-
-        // Clear and redraw
-        ctx.clearRect(0, 0, cubeCanvas.width, cubeCanvas.height);
-        drawCubeWithOffset(ctx, cubeOffsetY, questionMarkOffset);
-
-        requestAnimationFrame(animate);
-      }
-      requestAnimationFrame(animate);
-    }
 
     // Listen for resize so that on mobile -> desktop transitions, we recalc
     window.addEventListener("resize", () => {
@@ -467,4 +549,3 @@
   </script>
 </body>
 </html>
-
